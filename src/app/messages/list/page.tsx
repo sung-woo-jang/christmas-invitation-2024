@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { User, ChevronRight, MessageCircle } from 'lucide-react';
+import { MessageCircle, User } from 'lucide-react';
 
 interface Message {
   id: number;

@@ -97,7 +97,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </main>
       <footer className='bg-gray-100 text-center py-4 mt-8'>
         <p className='text-gray-600'>
-          &copy; 2023 사랑의 교회. All rights reserved.
+          &copy; 2024 계산 교회. All rights reserved.
         </p>
       </footer>
     </div>

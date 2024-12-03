@@ -8,8 +8,8 @@ interface Message {
   id: number;
   content: string;
   name: string;
+  password: string;
 }
-
 export default function MessageList() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,26 +23,31 @@ export default function MessageList() {
           id: 1,
           content: '메리 크리스마스! 모두에게 축복이 가득하길 바랍니다.',
           name: '김성실',
+          password: 'asd',
         },
         {
           id: 2,
           content: '예수님의 사랑이 우리 모두에게 함께하기를.',
           name: '이축복',
+          password: 'asd',
         },
         {
           id: 3,
           content: '올해도 감사한 마음으로 크리스마스를 맞이합니다.',
           name: '박감사',
+          password: 'asd',
         },
         {
           id: 4,
           content: '우리 교회 모든 분들께 평화와 기쁨이 가득하시길!',
           name: '정평화',
+          password: 'asd',
         },
         {
           id: 5,
           content: '크리스마스의 진정한 의미를 되새기는 시간 되세요.',
           name: '최은혜',
+          password: 'asd',
         },
       ];
       setMessages(dummyMessages);

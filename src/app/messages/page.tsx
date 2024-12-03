@@ -1,15 +1,49 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
+import { User } from 'lucide-react';
 
 interface Message {
   id: number;
   content: string;
   name: string;
+  password: string;
 }
 
 export default function Messages() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: 1,
+      content: '축하드립니다! 행복한 날 되세요.',
+      name: '김철수',
+      password: 'qwe',
+    },
+    {
+      id: 2,
+      content: '새로운 출발을 응원합니다!',
+      name: '이영희',
+      password: 'qwe',
+    },
+    {
+      id: 3,
+      content: '축하합니다. 좋은 날 되세요~',
+      name: '박지성',
+      password: 'qwe',
+    },
+    {
+      id: 4,
+      content: '늘 행복하세요~~~~~~~~~~!',
+      name: '최유리',
+      password: 'qwe',
+    },
+    {
+      id: 5,
+      content: '축하드려요! 멋진 날 되세요.',
+      name: '정민수',
+      password: 'qwe',
+    },
+  ]);
   const [newMessage, setNewMessage] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
@@ -23,6 +57,7 @@ export default function Messages() {
           id: Date.now(),
           content: newMessage.trim(),
           name: name.trim() || '익명',
+          password: password.trim() || '1234',
         },
         ...messages,
       ]);
@@ -94,14 +129,34 @@ export default function Messages() {
           등록
         </button>
       </form>
-      <ul>
-        {messages.map((message) => (
-          <li key={message.id} className='mb-2'>
-            <span className='font-bold'>{message.name}: </span>
-            {message.content}
-          </li>
-        ))}
-      </ul>
+      <div className='mt-8'>
+        <h2 className='text-2xl font-bold mb-4'>최근 메시지</h2>
+        <div className='space-y-4'>
+          {messages.slice(0, 3).map((message) => (
+            <div
+              key={message.id}
+              className='bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300'
+            >
+              <div className='flex items-start justify-between'>
+                <div>
+                  <p className='text-gray-800 mb-2'>{message.content}</p>
+                  <p className='text-sm text-indigo-600 flex items-center'>
+                    <User className='mr-1' size={16} /> {message.name}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className='mt-4 text-center'>
+        <Link
+          href='/messages/list'
+          className='text-indigo-600 hover:text-indigo-800'
+        >
+          모든 메시지 보기
+        </Link>
+      </div>
     </div>
   );
 }

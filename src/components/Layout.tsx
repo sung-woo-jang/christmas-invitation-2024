@@ -95,11 +95,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <main className='container mx-auto px-4 sm:px-6 lg:px-8 py-8'>
         {children}
       </main>
-      <footer className='bg-gray-100 text-center py-4 mt-8'>
-        <p className='text-gray-600'>
-          &copy; 2024 계산 교회. All rights reserved.
-        </p>
-      </footer>
     </div>
   );
 }

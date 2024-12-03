@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎄 예수님의 생일에 초대합니다
 
-## Getting Started
+환영합니다! 이 웹사이트는 교회의 크리스마스 행사를 위해 만들어진 공간입니다.
 
-First, run the development server:
+## 📱 주요 기능 안내
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### 1. 메인 페이지
+- 크리스마스 행사 일시와 장소 확인
+- 성경 말씀 묵상
+- 포토존 바로가기
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. 포토존 📸
+- 교회 내 다양한 포토존 위치 안내
+- 각 포토존별 사진 미리보기 제공
+- 포토존 위치 찾기
+    - 교회 2층 로비
+    - 교회 3층
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. 축하 메시지 게시판 💌
+- 축하 메시지 작성하기
+    - 이름 (선택사항, 입력하지 않으면 '익명'으로 표시됩니다)
+    - 비밀번호 입력 (게시글 작성시 '1234' 입력)
+    - 축하 메시지 내용
+- 다른 분들의 축하 메시지 보기
+- '모든 메시지 보기'를 통해 전체 메시지 확인 가능
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 💡 이용 시 참고사항
 
-## Learn More
+1. 메시지 작성 시 비밀번호는 '1234'입니다.
+2. 포토존은 자유롭게 이용하실 수 있습니다.
+3. 포토존 위치를 찾기 어려우시다면, 안내데스크에 문의해 주세요.
+4. 메시지 게시판에는 축하와 격려의 메시지만 작성해 주세요.
 
-To learn more about Next.js, take a look at the following resources:
+## 📞 문의사항
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+궁금하신 점이나 도움이 필요하시다면 교회 사무실로 문의해 주시기 바랍니다.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+우리 모두 함께 예수님의 탄생을 기뻐하며 축하해요! 🎉

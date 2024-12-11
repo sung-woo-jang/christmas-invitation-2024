@@ -1,14 +1,26 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Camera, MapPin } from 'lucide-react';
 
-export default function PhotoZoneList() {
-  const photoZones = [
-    { id: 1, name: 'photo_zone_1.webp', location: '교회 3층' },
-    { id: 2, name: 'photo_zone_2.webp', location: '교회 2층 로비' },
-    { id: 3, name: 'photo_zone_3.webp', location: '교회 1층 입구' },
-  ];
+interface Photo {
+  id: number;
+  name: string;
+  lastModified: string;
+  size: number;
+}
+
+interface PhotoResponse {
+  photos: Photo[];
+}
+
+async function getPhotos(): Promise<Photo[]> {
+  const res = await fetch('http://localhost:3000/api/photos');
+  const data: PhotoResponse = await res.json();
+  return data.photos;
+}
+
+export default async function PhotoZoneList() {
+  const photos = await getPhotos();
 
   return (
     <div className='mt-12 bg-gradient-to-r from-indigo-100 to-purple-100 p-6 rounded-xl shadow-lg'>
@@ -16,22 +28,22 @@ export default function PhotoZoneList() {
         포토존 리스트
       </h1>
       <div className='grid gap-6'>
-        {photoZones.map((zone) => (
-          <div key={zone.id} className='bg-white p-6 rounded-lg shadow-lg'>
-            <h2 className='text-xl font-semibold text-indigo-600 mb-2 flex items-center'>
-              <Camera className='mr-2' /> {zone.name}
-            </h2>
-            <p className='text-gray-700 mb-4 flex items-center'>
-              <MapPin className='mr-2 text-indigo-600' /> 위치: {zone.location}
-            </p>
+        {photos.map((photo) => (
+          <div key={photo.id} className='bg-white p-6 rounded-lg shadow-lg'>
             <div className='aspect-video relative mb-4'>
               <Image
-                src={`/${zone.name}`}
-                alt={zone.name}
-                layout='fill'
-                objectFit='cover'
-                className='rounded-lg'
+                src={photo.name}
+                alt={`포토존 ${photo.id}`}
+                fill
+                sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+                className='rounded-lg object-cover'
               />
+              <div className='absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2'>
+                <p>크기: {Math.round(photo.size / 1024)} KB</p>
+                <p>
+                  수정일: {new Date(photo.lastModified).toLocaleDateString()}
+                </p>
+              </div>
             </div>
           </div>
         ))}

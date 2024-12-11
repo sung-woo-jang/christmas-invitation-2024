@@ -1,131 +1,40 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Camera, MapPin, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import crypto from 'crypto';
 import axios from 'axios';
+
+interface Photo {
+  id: number;
+  name: string;
+  location: string;
+}
 export default function PhotoZone() {
-  const photoZones = [
+  const [photoZones, setPhotoZones] = useState<Photo[]>([
     {
       id: 1,
-      name: 'https://kr.object.ncloudstorage.com/kcc-invite/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%2020241203%20%EC%98%A4%ED%9B%84%208.06.02.png',
+      name: 'https://kr.object.ncloudstorage.com/kcc-invite/photo_zone_2.webp',
+      // name: '/photo_zone_1.webp',
       location: '교회 3층',
     },
-  ];
+    {
+      id: 2,
+      name: 'https://kr.object.ncloudstorage.com/kcc-invite/photo_zone_2.webp',
+      // name: '/photo_zone_2.webp',
+      location: '교회 3층',
+    },
+    {
+      id: 3,
+      name: 'https://kr.object.ncloudstorage.com/kcc-invite/photo_zone_2.webp',
+      // name: '/photo_zone_2.webp',
+      location: '교회 3층',
+    },
+  ]);
 
-  useEffect(() => {
-    const fetchPhotos = async () => {
-      try {
-        const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
-        const timestamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
-
-        // AWS Signature V4 parameters
-        const accessKey = 'ncp_iam_BPAMKR3V7PDLzwbyQHQo';
-        const secretKey = 'ncp_iam_BPKMKRLgjIRSPKDkytSgsV68238Iu54hn2';
-        const region = 'kr-standard';
-        const service = 's3';
-
-        // Create canonical request
-        const method = 'GET';
-        const canonicalUri = '/kcc-invite';
-        const canonicalQueryString = '';
-        const payloadHash =
-          'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'; // Empty payload hash
-
-        const canonicalHeaders =
-          [
-            `host:kr.object.ncloudstorage.com`,
-            `x-amz-content-sha256:${payloadHash}`,
-            `x-amz-date:${timestamp}`,
-          ].join('\n') + '\n';
-
-        const signedHeaders = 'host;x-amz-content-sha256;x-amz-date';
-
-        const canonicalRequest = [
-          method,
-          canonicalUri,
-          canonicalQueryString,
-          canonicalHeaders,
-          signedHeaders,
-          payloadHash,
-        ].join('\n');
-
-        // Create string to sign
-        const algorithm = 'AWS4-HMAC-SHA256';
-        const scope = `${date}/${region}/${service}/aws4_request`;
-        const stringToSign = [
-          algorithm,
-          timestamp,
-          scope,
-          crypto.createHash('sha256').update(canonicalRequest).digest('hex'),
-        ].join('\n');
-
-        // Calculate signature
-        const getSignatureKey = (
-          key: any,
-          dateStamp: any,
-          regionName: any,
-          serviceName: any,
-        ) => {
-          const kDate = crypto
-            .createHmac('sha256', 'AWS4' + key)
-            .update(dateStamp)
-            .digest();
-          const kRegion = crypto
-            .createHmac('sha256', kDate)
-            .update(regionName)
-            .digest();
-          const kService = crypto
-            .createHmac('sha256', kRegion)
-            .update(serviceName)
-            .digest();
-          const kSigning = crypto
-            .createHmac('sha256', kService)
-            .update('aws4_request')
-            .digest();
-          return kSigning;
-        };
-
-        const signature = crypto
-          .createHmac(
-            'sha256',
-            getSignatureKey(secretKey, date, region, service),
-          )
-          .update(stringToSign)
-          .digest('hex');
-
-        // Create authorization header
-        const authorizationHeader = [
-          `${algorithm} Credential=${accessKey}/${scope}`,
-          `SignedHeaders=${signedHeaders}`,
-          `Signature=${signature}`,
-        ].join(', ');
-
-        const response = await axios.get(
-          'https://kr.object.ncloudstorage.com/kcc-invite',
-          {
-            headers: {
-              Authorization: authorizationHeader,
-              'x-amz-content-sha256': payloadHash,
-              'x-amz-date': timestamp,
-            },
-          },
-        );
-
-        // Process the response data as needed
-        console.log('Response:', response.data);
-        // Update state with the fetched data if needed
-        // setPhotoZones(processedData);
-      } catch (error) {
-        console.error('Error fetching photos:', error);
-      }
-    };
-
-    fetchPhotos();
-  }, []);
   return (
     <div className='max-w-3xl mx-auto px-4'>
       <h1 className='text-4xl font-bold text-center text-indigo-600 mb-8'>
@@ -197,22 +106,14 @@ export default function PhotoZone() {
         <div className='grid gap-6'>
           {photoZones.map((zone) => (
             <div key={zone.id} className='bg-white p-6 rounded-lg shadow-lg'>
-              <h2 className='text-xl font-semibold text-indigo-600 mb-2 flex items-center'>
-                <Camera className='mr-2' /> {zone.name}
-              </h2>
-              <p className='text-gray-700 mb-4 flex items-center'>
-                <MapPin className='mr-2 text-indigo-600' /> 위치:{' '}
-                {zone.location}
-              </p>
               <div className='aspect-video relative mb-4'>
                 <Image
                   src={zone.name}
                   alt={zone.name}
-                  width={500}
-                  height={500}
-                  // layout='fill'
-                  // objectFit='cover'
-                  className='rounded-lg'
+                  // width={500}
+                  // height={500}
+                  fill
+                  className='rounded-lg object-cover'
                 />
               </div>
             </div>

@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import UploadForm from '@/app/photozone/list/upload';
 import { revalidatePath } from 'next/cache';
-import { getPhotosWithBase64 } from '@/utils/object-storage';
 
 interface Photo {
   id: number;
@@ -18,8 +17,13 @@ interface PhotoResponse {
   photos: Photo[];
 }
 
+async function getPhotos(): Promise<Photo[]> {
+  const res = await fetch('http://localhost:3000/api/photos');
+  const data: PhotoResponse = await res.json();
+  return data.photos;
+}
 export default async function PhotoZoneList() {
-  const photos = await getPhotosWithBase64();
+  const photos = await getPhotos();
 
   async function revalidatePhotos() {
     'use server';

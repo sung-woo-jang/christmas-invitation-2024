@@ -1,13 +1,12 @@
-// app/photozone/list/upload.tsx (클라이언트 컴포넌트)
 'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 export default function UploadForm({
-  onUploadComplete,
+  onUploadCompleteAction,
 }: {
-  onUploadComplete: () => void;
+  onUploadCompleteAction: () => void;
 }) {
   const [isUploading, setIsUploading] = useState(false);
 
@@ -28,7 +27,7 @@ export default function UploadForm({
       if (!response.ok) throw new Error('Upload failed');
 
       const data = await response.json();
-      onUploadComplete();
+      onUploadCompleteAction();
     } catch (error) {
       console.error('Error:', error);
     } finally {

@@ -34,7 +34,7 @@ export default async function PhotoZoneList() {
 
       <div className='mb-8'>
         <Suspense fallback={<div>업로드 폼 로딩중...</div>}>
-          <UploadForm onUploadComplete={revalidatePhotos} />
+          <UploadForm onUploadCompleteAction={revalidatePhotos} />
         </Suspense>
       </div>
 

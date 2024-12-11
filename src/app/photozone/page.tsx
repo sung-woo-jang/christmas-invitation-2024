@@ -104,5 +104,3 @@ export default async function PhotoZone() {
     </div>
   );
 }
-export const dynamic = 'force-dynamic'; // 페이지를 동적으로 렌더링
-export const revalidate = 0; // 캐시 비활성화

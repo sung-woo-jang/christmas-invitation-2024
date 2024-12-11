@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import UploadForm from '@/app/photozone/list/upload';
 import { revalidatePath } from 'next/cache';
-import { getPhotosWithBase64 } from '@/app/api/photos/route';
+import { getPhotosWithBase64 } from '@/utils/object-storage';
 
 interface Photo {
   id: number;

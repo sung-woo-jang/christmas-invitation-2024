@@ -1,8 +1,8 @@
-// src/app/api/photos/route.ts
-import { NextResponse } from 'next/server';
+// utils/object-storage-server.ts
 import axios from 'axios';
 import crypto from 'crypto';
 import { parseStringPromise } from 'xml2js';
+import { NextResponse } from 'next/server';
 
 interface PhotoItem {
   Key: string[];
@@ -14,6 +14,14 @@ interface ParsedResponse {
   ListBucketResult: {
     Contents: PhotoItem[];
   };
+}
+
+interface Photo {
+  id: number;
+  name: string;
+  lastModified: string;
+  size: number;
+  base64Url?: string;
 }
 
 const getSignatureKey = (
@@ -37,175 +45,132 @@ const getSignatureKey = (
   return crypto.createHmac('sha256', kService).update('aws4_request').digest();
 };
 
-export async function GET() {
+const getAuthHeaders = (
+  accessKey: string,
+  secretKey: string,
+  bucketName: string = 'kcc-invite',
+) => {
+  const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
+  const timestamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
+  const region = 'kr-standard';
+  const service = 's3';
+
+  const method = 'GET';
+  const canonicalUri = `/${bucketName}`;
+  const canonicalQueryString = '';
+  const payloadHash = 'UNSIGNED-PAYLOAD';
+
+  const canonicalHeaders =
+    [
+      `host:kr.object.ncloudstorage.com`,
+      `x-amz-content-sha256:${payloadHash}`,
+      `x-amz-date:${timestamp}`,
+    ].join('\n') + '\n';
+
+  const signedHeaders = 'host;x-amz-content-sha256;x-amz-date';
+
+  const canonicalRequest = [
+    method,
+    canonicalUri,
+    canonicalQueryString,
+    canonicalHeaders,
+    signedHeaders,
+    payloadHash,
+  ].join('\n');
+
+  const algorithm = 'AWS4-HMAC-SHA256';
+  const scope = `${date}/${region}/${service}/aws4_request`;
+  const stringToSign = [
+    algorithm,
+    timestamp,
+    scope,
+    crypto.createHash('sha256').update(canonicalRequest).digest('hex'),
+  ].join('\n');
+
+  const signature = crypto
+    .createHmac('sha256', getSignatureKey(secretKey, date, region, service))
+    .update(stringToSign)
+    .digest('hex');
+
+  const authorizationHeader = [
+    `${algorithm} Credential=${accessKey}/${scope}`,
+    `SignedHeaders=${signedHeaders}`,
+    `Signature=${signature}`,
+  ].join(', ');
+
+  return {
+    Authorization: authorizationHeader,
+    'x-amz-content-sha256': payloadHash,
+    'x-amz-date': timestamp,
+    host: 'kr.object.ncloudstorage.com',
+  };
+};
+
+export const getPhotosWithBase64 = async (): Promise<Photo[]> => {
+  const accessKey = 'mtIVeRz3eDhYFpjIqF1c';
+  const secretKey = 'x1QTNtCMK03kWlXplh2vgFU1rLhekIlV6VK5t4V5';
+
   try {
-    const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
-    const timestamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
-    const accessKey = 'ncp_iam_BPAMKR3V7PDLzwbyQHQo';
-    const secretKey = 'ncp_iam_BPKMKRLgjIRSPKDkytSgsV68238Iu54hn2';
-    const region = 'kr-standard';
-    const service = 's3';
-
-    const method = 'GET';
-    const canonicalUri = '/kcc-invite';
-    const canonicalQueryString = '';
-    const payloadHash =
-      'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
-
-    const canonicalHeaders =
-      [
-        `host:kr.object.ncloudstorage.com`,
-        `x-amz-content-sha256:${payloadHash}`,
-        `x-amz-date:${timestamp}`,
-      ].join('\n') + '\n';
-
-    const signedHeaders = 'host;x-amz-content-sha256;x-amz-date';
-
-    const canonicalRequest = [
-      method,
-      canonicalUri,
-      canonicalQueryString,
-      canonicalHeaders,
-      signedHeaders,
-      payloadHash,
-    ].join('\n');
-
-    const algorithm = 'AWS4-HMAC-SHA256';
-    const scope = `${date}/${region}/${service}/aws4_request`;
-    const stringToSign = [
-      algorithm,
-      timestamp,
-      scope,
-      crypto.createHash('sha256').update(canonicalRequest).digest('hex'),
-    ].join('\n');
-
-    const signature = crypto
-      .createHmac('sha256', getSignatureKey(secretKey, date, region, service))
-      .update(stringToSign)
-      .digest('hex');
-
-    const authorizationHeader = [
-      `${algorithm} Credential=${accessKey}/${scope}`,
-      `SignedHeaders=${signedHeaders}`,
-      `Signature=${signature}`,
-    ].join(', ');
-
-    const response = await axios.get(
+    // 1. 먼저 파일 목록을 가져옴
+    const listHeaders = getAuthHeaders(accessKey, secretKey);
+    const listResponse = await axios.get(
       'https://kr.object.ncloudstorage.com/kcc-invite',
-      {
-        headers: {
-          Authorization: authorizationHeader,
-          'x-amz-content-sha256': payloadHash,
-          'x-amz-date': timestamp,
-        },
-      },
+      { headers: listHeaders },
     );
-    // console.log(response);
-    // XML을 JSON으로 파싱
-    const parsed: ParsedResponse = await parseStringPromise(response.data);
 
-    // 필요한 데이터만 추출하여 가공
+    const parsed: ParsedResponse = await parseStringPromise(listResponse.data);
     const photos = parsed.ListBucketResult.Contents.map(
       (item: PhotoItem, index: number) => ({
         id: index + 1,
-        name: `https://kr.object.ncloudstorage.com/kcc-invite/${encodeURIComponent(item.Key[0])}`,
+        name: `https://kr.object.ncloudstorage.com/kcc-invite/${encodeURIComponent(
+          item.Key[0],
+        )}`,
         lastModified: item.LastModified[0],
         size: parseInt(item.Size[0], 10),
       }),
     );
 
-    return NextResponse.json({ photos });
+    // 2. 각 이미지를 base64로 변환
+    const photosWithBase64 = await Promise.all(
+      photos.map(async (photo) => {
+        try {
+          const imgHeaders = getAuthHeaders(
+            accessKey,
+            secretKey,
+            `kcc-invite/${photo.name.split('/').pop()}`,
+          );
+          const imageResponse = await axios.get(photo.name, {
+            responseType: 'arraybuffer',
+            headers: imgHeaders,
+          });
+
+          const base64 = Buffer.from(imageResponse.data, 'binary').toString(
+            'base64',
+          );
+          const contentType = imageResponse.headers['content-type'];
+
+          return {
+            ...photo,
+            base64Url: `data:${contentType};base64,${base64}`,
+          };
+        } catch (error) {
+          console.error(`Error fetching image ${photo.name}:`, error);
+          return photo;
+        }
+      }),
+    );
+
+    return photosWithBase64;
   } catch (error) {
-    console.error('Error:', error);
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 },
-    );
+    console.error('Error fetching photos:', error);
+    throw error;
   }
-}
+};
 
-// src/app/api/photos/route.ts
-export async function PUT(request: Request) {
+export async function GET() {
   try {
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
-    const fileName = formData.get('fileName') as string;
-
-    const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
-    const timestamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
-    const accessKey = 'ncp_iam_BPAMKR3V7PDLzwbyQHQo';
-    const secretKey = 'ncp_iam_BPKMKRLgjIRSPKDkytSgsV68238Iu54hn2';
-    const region = 'kr-standard';
-    const service = 's3';
-
-    // 파일을 버퍼로 변환
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const payloadHash = crypto
-      .createHash('sha256')
-      .update(buffer)
-      .digest('hex');
-
-    const canonicalHeaders =
-      [
-        `content-length:${buffer.length}`,
-        `content-type:${file.type}`,
-        `host:kr.object.ncloudstorage.com`,
-        `x-amz-content-sha256:${payloadHash}`,
-        `x-amz-date:${timestamp}`,
-      ].join('\n') + '\n';
-
-    const signedHeaders =
-      'content-length;content-type;host;x-amz-content-sha256;x-amz-date';
-
-    const canonicalRequest = [
-      'PUT',
-      `/kcc-invite/${encodeURIComponent(fileName)}`,
-      '',
-      canonicalHeaders,
-      signedHeaders,
-      payloadHash,
-    ].join('\n');
-
-    const algorithm = 'AWS4-HMAC-SHA256';
-    const scope = `${date}/${region}/${service}/aws4_request`;
-    const stringToSign = [
-      algorithm,
-      timestamp,
-      scope,
-      crypto.createHash('sha256').update(canonicalRequest).digest('hex'),
-    ].join('\n');
-
-    // 서명키 생성 함수는 기존과 동일
-
-    const signature = crypto
-      .createHmac('sha256', getSignatureKey(secretKey, date, region, service))
-      .update(stringToSign)
-      .digest('hex');
-
-    const authorizationHeader = [
-      `${algorithm} Credential=${accessKey}/${scope}`,
-      `SignedHeaders=${signedHeaders}`,
-      `Signature=${signature}`,
-    ].join(', ');
-
-    const response = await axios.put(
-      `https://kr.object.ncloudstorage.com/kcc-invite/${encodeURIComponent(fileName)}`,
-      buffer,
-      {
-        headers: {
-          'Content-Type': file.type,
-          'Content-Length': buffer.length,
-          Authorization: authorizationHeader,
-          'x-amz-content-sha256': payloadHash,
-          'x-amz-date': timestamp,
-        },
-      },
-    );
-
-    return NextResponse.json({
-      success: true,
-      message: 'File uploaded successfully',
-    });
+    const photos = await getPhotosWithBase64();
+    return NextResponse.json({ photos });
   } catch (error) {
     console.error('Error:', error);
     return NextResponse.json(

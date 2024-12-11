@@ -7,6 +7,7 @@ interface Photo {
   name: string;
   lastModified: string;
   size: number;
+  base64Url: string;
 }
 
 interface PhotoResponse {
@@ -18,32 +19,25 @@ async function getPhotos(): Promise<Photo[]> {
   const data: PhotoResponse = await res.json();
   return data.photos;
 }
-
 export default async function PhotoZoneList() {
   const photos = await getPhotos();
-
+  console.log(1);
   return (
     <div className='mt-12 bg-gradient-to-r from-indigo-100 to-purple-100 p-6 rounded-xl shadow-lg'>
       <h1 className='text-3xl font-bold text-center text-indigo-600 my-8'>
         포토존 리스트
       </h1>
       <div className='grid gap-6'>
-        {photos.map((photo) => (
+        {photos?.map((photo) => (
           <div key={photo.id} className='bg-white p-6 rounded-lg shadow-lg'>
             <div className='aspect-video relative mb-4'>
               <Image
-                src={photo.name}
+                src={photo.base64Url}
                 alt={`포토존 ${photo.id}`}
                 fill
-                sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
-                className='rounded-lg object-cover'
+                style={{ objectFit: 'cover' }}
+                className='rounded-lg'
               />
-              <div className='absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2'>
-                <p>크기: {Math.round(photo.size / 1024)} KB</p>
-                <p>
-                  수정일: {new Date(photo.lastModified).toLocaleDateString()}
-                </p>
-              </div>
             </div>
           </div>
         ))}

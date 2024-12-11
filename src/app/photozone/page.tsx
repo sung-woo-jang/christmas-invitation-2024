@@ -1,39 +1,11 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { Camera, MapPin, ChevronRight } from 'lucide-react';
+import { Camera, ChevronRight, MapPin } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import crypto from 'crypto';
-import axios from 'axios';
+import { getPhotosWithBase64 } from '@/utils/object-storage';
 
-interface Photo {
-  id: number;
-  name: string;
-  location: string;
-}
-export default function PhotoZone() {
-  const [photoZones, setPhotoZones] = useState<Photo[]>([
-    {
-      id: 1,
-      name: 'https://kr.object.ncloudstorage.com/kcc-invite/photo_zone_2.webp',
-      // name: '/photo_zone_1.webp',
-      location: '교회 3층',
-    },
-    {
-      id: 2,
-      name: 'https://kr.object.ncloudstorage.com/kcc-invite/photo_zone_2.webp',
-      // name: '/photo_zone_2.webp',
-      location: '교회 3층',
-    },
-    {
-      id: 3,
-      name: 'https://kr.object.ncloudstorage.com/kcc-invite/photo_zone_2.webp',
-      // name: '/photo_zone_2.webp',
-      location: '교회 3층',
-    },
-  ]);
+export default async function PhotoZone() {
+  const photos = await getPhotosWithBase64();
 
   return (
     <div className='max-w-3xl mx-auto px-4'>
@@ -104,14 +76,12 @@ export default function PhotoZone() {
         </h3>
 
         <div className='grid gap-6'>
-          {photoZones.map((zone) => (
-            <div key={zone.id} className='bg-white p-6 rounded-lg shadow-lg'>
+          {photos?.map((photo) => (
+            <div key={photo.id} className='bg-white p-6 rounded-lg shadow-lg'>
               <div className='aspect-video relative mb-4'>
                 <Image
-                  src={zone.name}
-                  alt={zone.name}
-                  // width={500}
-                  // height={500}
+                  src={photo?.base64Url ? photo?.base64Url : '/Christmas.webp'}
+                  alt={`포토존 ${photo.id}`}
                   fill
                   className='rounded-lg object-cover'
                 />

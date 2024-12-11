@@ -6,7 +6,15 @@ import { getPhotosWithBase64, getSignatureKey } from '@/utils/object-storage';
 export async function GET() {
   try {
     const photos = await getPhotosWithBase64();
-    return NextResponse.json({ photos });
+    return NextResponse.json(
+      { photos },
+      {
+        headers: {
+          'Cache-Control': 'no-store, must-revalidate',
+          Pragma: 'no-cache',
+        },
+      },
+    );
   } catch (error) {
     console.error('Error:', error);
     return NextResponse.json(

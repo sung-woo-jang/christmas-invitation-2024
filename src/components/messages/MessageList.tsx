@@ -1,6 +1,8 @@
-import { User, X } from 'lucide-react';
+import { Trash2, User, X } from 'lucide-react';
 import { deleteMessage, getMessages, Message } from '@/utils/firebasedb';
 import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { DeleteConfirmModal } from '@/components/messages/DeleteConfirmModal';
 
 interface MessageListProps {
   reRenderKey?: number;
@@ -57,9 +59,10 @@ interface MessageCardProps {
 }
 
 function MessageCard({ message, onDelete }: MessageCardProps) {
-  const handleDelete = async () => {
-    const password = prompt('메시지를 삭제하려면 비밀번호를 입력하세요:');
-    if (!password || !message.id) return;
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const handleDelete = async (password: string) => {
+    if (!message.id) return;
 
     try {
       const result = await deleteMessage(message.id, password);
@@ -72,6 +75,8 @@ function MessageCard({ message, onDelete }: MessageCardProps) {
     } catch (error) {
       console.error('Error deleting message:', error);
       alert('메시지 삭제 중 오류가 발생했습니다.');
+    } finally {
+      setIsDeleteModalOpen(false);
     }
   };
 
@@ -91,14 +96,21 @@ function MessageCard({ message, onDelete }: MessageCardProps) {
             )}
           </div>
         </div>
-        <button
-          onClick={handleDelete}
-          className='ml-4 p-1 text-gray-400 hover:text-red-500 transition-colors'
+        <Button
+          variant='ghost'
+          size='icon'
+          onClick={() => setIsDeleteModalOpen(true)}
+          className='ml-4 text-gray-400 hover:text-red-500 transition-colors'
           title='메시지 삭제'
         >
-          <X size={20} />
-        </button>
+          <Trash2 size={20} />
+        </Button>
       </div>
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

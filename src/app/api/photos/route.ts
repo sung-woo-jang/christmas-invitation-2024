@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import sharp from 'sharp';
 import { getPhotosWithBase64, getSignatureKey } from '@/utils/object-storage';
+import { randomBytes } from 'node:crypto';
 
 export async function GET() {
   try {
@@ -32,16 +33,30 @@ export async function PUT(request: Request) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    const fileName = encodeURIComponent(file.name);
+    const fileExtension = file.name.split('.').pop();
+    const uniqueString = randomBytes(8).toString('hex');
+    const fileName = encodeURIComponent(
+      `${Date.now()}_${uniqueString}.${fileExtension}`,
+    );
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
+
+    /*
+     interface FitEnum {
+        contain: 'contain';
+        cover: 'cover';
+        fill: 'fill';
+        inside: 'inside';
+        outside: 'outside';
+    }
+    */
 
     const buffer = await sharp(Buffer.from(await file.arrayBuffer()))
       .resize({
         width: 430,
         height: 932,
-        fit: 'inside',
+        fit: 'contain',
         withoutEnlargement: true,
       })
       .jpeg({ quality: 80 })

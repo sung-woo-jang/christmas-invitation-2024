@@ -1,34 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { MessageCircle } from 'lucide-react';
-import { getMessages, Message } from '@/utils/firebasedb';
 import { MessageList } from '@/components/messages/MessageList';
 
 export default function Page() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [initialLoading, setInitialLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const recentMessages = await getMessages(3); // 최근 3개의 메시지만 가져오기
-        setMessages(recentMessages);
-      } catch (error) {
-        console.error('Error fetching recent messages:', error);
-      } finally {
-        setInitialLoading(false);
-      }
-    })();
-  }, []);
-
   return (
     <div className='max-w-4xl mx-auto'>
       <h1 className='text-4xl font-bold text-center text-indigo-600 mb-8'>
         축복 메시지 목록
       </h1>
-      <MessageList messages={messages} loading={initialLoading} />
+      <MessageList />
       <div className='mt-8 text-center'>
         <Link
           href='/messages'

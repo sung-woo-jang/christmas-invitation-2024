@@ -1,12 +1,28 @@
 import { User } from 'lucide-react';
-import { Message } from '@/utils/firebasedb';
+import { getMessages, Message } from '@/utils/firebasedb';
+import { useEffect, useState } from 'react';
 
 interface MessageListProps {
-  messages: Message[];
-  loading?: boolean;
+  limit?: number;
 }
 
-export function MessageList({ messages, loading = false }: MessageListProps) {
+export function MessageList({ limit }: MessageListProps) {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const recentMessages = await getMessages(limit); // 최근 3개의 메시지만 가져오기
+        setMessages(recentMessages);
+      } catch (error) {
+        console.error('Error fetching recent messages:', error);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
   if (loading) {
     return (
       <div className='text-center text-gray-600'>메시지를 불러오는 중...</div>

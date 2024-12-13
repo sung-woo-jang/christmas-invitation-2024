@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { revalidatePath } from 'next/cache';
 
 interface PhotoZonePreviewProps {
   photos: Photo[];
@@ -30,11 +31,33 @@ export default function PhotoZoneList({
     setIsDeleteModalOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
-    // 실제 삭제 로직을 여기에 구현합니다.
-    console.log('Deleting photo:', photoToDelete);
-    setIsDeleteModalOpen(false);
-    setPhotoToDelete(null);
+  const handleDeleteConfirm = async () => {
+    if (!photoToDelete) return;
+
+    try {
+      // URL에서 파일명만 추출 (마지막 '/' 이후의 문자열)
+      const fileName = photoToDelete.name.split('/').pop();
+      if (!fileName) return;
+
+      const response = await fetch(
+        `/api/photos?fileName=${encodeURIComponent(fileName)}`,
+        {
+          method: 'DELETE',
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to delete photo');
+      }
+
+      // 성공적으로 삭제되면 UI에서도 제거
+      setIsDeleteModalOpen(false);
+      setPhotoToDelete(null);
+      window.location.reload();
+    } catch (error) {
+      console.error('Error deleting photo:', error);
+      // 에러 처리 로직 추가
+    }
   };
 
   return (

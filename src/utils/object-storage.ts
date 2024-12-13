@@ -162,3 +162,95 @@ export const getPhotosWithBase64 = async (): Promise<Photo[]> => {
     throw error;
   }
 };
+interface DeleteOptions {
+  accessKey: string;
+  secretKey: string;
+  bucketName: string;
+  objectKey: string;
+}
+const getDeleteHeaders = ({
+  accessKey,
+  secretKey,
+  bucketName,
+  objectKey,
+}: DeleteOptions) => {
+  const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
+  const timestamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
+  const region = 'kr-standard';
+  const service = 's3';
+
+  const method = 'DELETE';
+  const canonicalUri = `/${bucketName}/${objectKey}`;
+  const canonicalQueryString = '';
+  const payloadHash = 'UNSIGNED-PAYLOAD';
+
+  const canonicalHeaders =
+    [
+      `host:kr.object.ncloudstorage.com`,
+      `x-amz-content-sha256:${payloadHash}`,
+      `x-amz-date:${timestamp}`,
+    ].join('\n') + '\n';
+
+  const signedHeaders = 'host;x-amz-content-sha256;x-amz-date';
+
+  const canonicalRequest = [
+    method,
+    canonicalUri,
+    canonicalQueryString,
+    canonicalHeaders,
+    signedHeaders,
+    payloadHash,
+  ].join('\n');
+
+  const algorithm = 'AWS4-HMAC-SHA256';
+  const scope = `${date}/${region}/${service}/aws4_request`;
+  const stringToSign = [
+    algorithm,
+    timestamp,
+    scope,
+    crypto.createHash('sha256').update(canonicalRequest).digest('hex'),
+  ].join('\n');
+
+  const signature = crypto
+    .createHmac('sha256', getSignatureKey(secretKey, date, region, service))
+    .update(stringToSign)
+    .digest('hex');
+
+  const authorizationHeader = [
+    `${algorithm} Credential=${accessKey}/${scope}`,
+    `SignedHeaders=${signedHeaders}`,
+    `Signature=${signature}`,
+  ].join(', ');
+
+  return {
+    Authorization: authorizationHeader,
+    'x-amz-content-sha256': payloadHash,
+    'x-amz-date': timestamp,
+    host: 'kr.object.ncloudstorage.com',
+  };
+};
+
+export const deleteObject = async ({
+  accessKey,
+  secretKey,
+  bucketName,
+  objectKey,
+}: DeleteOptions): Promise<boolean> => {
+  try {
+    const headers = getDeleteHeaders({
+      accessKey,
+      secretKey,
+      bucketName,
+      objectKey,
+    });
+    const response = await axios.delete(
+      `https://kr.object.ncloudstorage.com/${bucketName}/${encodeURIComponent(objectKey)}`,
+      { headers },
+    );
+
+    return response.status === 204; // S3 returns 204 No Content on successful deletion
+  } catch (error) {
+    console.error(`Error deleting object ${objectKey}:`, error);
+    throw error;
+  }
+};

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { MessageCircle } from 'lucide-react';
-import { MessageList } from '@/components/messages/MessageList';
+import MessageList from '@/components/messages/MessageList';
 
 export default function Page() {
   return (

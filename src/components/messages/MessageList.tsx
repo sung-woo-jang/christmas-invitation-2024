@@ -3,22 +3,28 @@ import { deleteMessage, getMessages, Message } from '@/utils/firebasedb';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { DeleteConfirmModal } from '@/components/messages/DeleteConfirmModal';
+import { useToast } from '@/hooks/use-toast';
 
 interface MessageListProps {
   reRenderKey?: number;
   limit?: number;
 }
 
-export function MessageList({ limit, reRenderKey }: MessageListProps) {
+export default function MessageList({ limit, reRenderKey }: MessageListProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const { toast } = useToast();
   const fetchMessages = async () => {
     try {
       const recentMessages = await getMessages(limit);
       setMessages(recentMessages);
     } catch (error) {
-      console.error('Error fetching recent messages:', error);
+      toast({
+        variant: 'destructive',
+        title: '메시지 로딩 실패',
+        description:
+          '최근 메시지를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',
+      });
     } finally {
       setLoading(false);
     }
@@ -60,6 +66,7 @@ interface MessageCardProps {
 
 function MessageCard({ message, onDelete }: MessageCardProps) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const { toast } = useToast();
 
   const handleDelete = async (password: string) => {
     if (!message.id) return;
@@ -67,14 +74,24 @@ function MessageCard({ message, onDelete }: MessageCardProps) {
     try {
       const result = await deleteMessage(message.id, password);
       if (result.success) {
-        alert('메시지가 삭제되었습니다.');
+        toast({
+          title: '메시지 삭제',
+          description: '메시지가 성공적으로 삭제되었습니다.',
+        });
         onDelete(); // 메시지 목록 새로고침
       } else {
-        alert(result.error || '메시지 삭제에 실패했습니다.');
+        toast({
+          variant: 'destructive',
+          title: '삭제 실패',
+          description: result.error || '메시지 삭제에 실패했습니다.',
+        });
       }
     } catch (error) {
-      console.error('Error deleting message:', error);
-      alert('메시지 삭제 중 오류가 발생했습니다.');
+      toast({
+        variant: 'destructive',
+        title: '에러 발생',
+        description: '메시지 삭제 중 오류가 발생했습니다.',
+      });
     } finally {
       setIsDeleteModalOpen(false);
     }

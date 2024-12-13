@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { MessageList } from '@/components/messages/MessageList';
+import MessageList from '@/components/messages/MessageList';
 import MessageForm from '@/components/messages/MessageForm';
 
 export default function Page() {

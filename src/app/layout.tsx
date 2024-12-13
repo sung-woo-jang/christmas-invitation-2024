@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Layout from '@/components/Layout';
 import React from 'react';
+import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
   title: '크리스마스 초대장',
@@ -35,6 +36,7 @@ export default function RootLayout({
     <html lang='ko-kr'>
       <body suppressHydrationWarning>
         <Layout>{children}</Layout>
+        <Toaster />
       </body>
     </html>
   );

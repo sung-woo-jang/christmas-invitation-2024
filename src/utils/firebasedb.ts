@@ -8,7 +8,9 @@ import {
   child,
   query,
   limitToLast,
+  remove,
 } from '@firebase/database';
+import { hashPassword } from '@/utils/crypto';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -81,5 +83,34 @@ export const getMessages = async (limit?: number): Promise<Message[]> => {
   } catch (error) {
     console.error('Error fetching messages:', error);
     return [];
+  }
+};
+
+export const deleteMessage = async (
+  id: string,
+  password: string,
+): Promise<{ success: boolean; error?: any }> => {
+  try {
+    // 먼저 메시지를 가져와서 비밀번호 확인
+    const dbRef = ref(database);
+    const messageRef = child(dbRef, `messages/${id}`);
+    const snapshot = await get(messageRef);
+
+    if (!snapshot.exists()) {
+      return { success: false, error: '메시지를 찾을 수 없습니다.' };
+    }
+
+    const message = snapshot.val();
+    const hashedInputPassword = await hashPassword(password);
+    if (message.password !== hashedInputPassword) {
+      return { success: false, error: '비밀번호가 일치하지 않습니다.' };
+    }
+
+    // 비밀번호가 일치하면 메시지 삭제
+    await remove(messageRef);
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting message:', error);
+    return { success: false, error };
   }
 };

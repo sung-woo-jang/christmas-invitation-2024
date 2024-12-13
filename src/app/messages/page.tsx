@@ -6,7 +6,7 @@ import { MessageList } from '@/components/messages/MessageList';
 import MessageForm from '@/components/messages/MessageForm';
 
 export default function Page() {
-  const [key, setKey] = useState(0); // MessageList를 리렌더링하기 위한 키
+  const [key, setKey] = useState<number>(0); // MessageList를 리렌더링하기 위한 키
 
   const handleMessageSubmit = (success: boolean) => {
     if (success) {
@@ -22,7 +22,7 @@ export default function Page() {
 
       <div className='mt-8'>
         <h2 className='text-2xl font-bold mb-4'>최근 메시지</h2>
-        <MessageList key={key} limit={3} />
+        <MessageList key={key} reRenderKey={key} limit={3} />
       </div>
 
       <div className='mt-4 text-center'>

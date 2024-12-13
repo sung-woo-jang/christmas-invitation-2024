@@ -1,6 +1,14 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, push, get, child } from '@firebase/database';
+import {
+  getDatabase,
+  ref,
+  push,
+  get,
+  child,
+  query,
+  limitToLast,
+} from '@firebase/database';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -45,15 +53,21 @@ export const saveMessage = async (
   }
 };
 
-export const getMessages = async (): Promise<Message[]> => {
+export const getMessages = async (limit?: number): Promise<Message[]> => {
   try {
     const dbRef = ref(database);
-    const snapshot = await get(child(dbRef, 'messages'));
+    const messagesRef = child(dbRef, 'messages');
+
+    // limit이 있는 경우 query를 사용하여 가져올 메시지 수 제한
+    const messagesQuery = limit
+      ? query(messagesRef, limitToLast(limit))
+      : messagesRef;
+
+    const snapshot = await get(messagesQuery);
 
     if (snapshot.exists()) {
       const messages: Message[] = [];
       snapshot.forEach((childSnapshot) => {
-        console.log(childSnapshot.val());
         messages.push({
           id: childSnapshot.key || undefined,
           ...childSnapshot.val(),

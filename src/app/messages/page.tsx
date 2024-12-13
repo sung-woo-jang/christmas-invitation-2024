@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { User } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { getMessages, Message, saveMessage } from '@/utils/firebasedb';
 import { hashPassword } from '@/utils/crypto';
+import { MessageList } from '@/components/messages/MessageList';
 
 // Zod 스키마 정의
 const messageSchema = z.object({
@@ -29,9 +29,23 @@ const messageSchema = z.object({
 
 type MessageFormData = z.infer<typeof messageSchema>;
 
-export default function Messages() {
+export default function Page() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const recentMessages = await getMessages(3); // 최근 3개의 메시지만 가져오기
+        setMessages(recentMessages);
+      } catch (error) {
+        console.error('Error fetching recent messages:', error);
+      } finally {
+        setInitialLoading(false);
+      }
+    })();
+  }, []);
 
   const {
     register,
@@ -50,7 +64,6 @@ export default function Messages() {
   const onSubmit = async (data: MessageFormData) => {
     setLoading(true);
     try {
-      // 비밀번호 해시화
       const hashedPassword = await hashPassword(data.password);
 
       const result = await saveMessage({
@@ -60,12 +73,10 @@ export default function Messages() {
       });
 
       if (result.success) {
-        // 폼 초기화
         reset();
-
-        // 메시지 목록 업데이트
-        const updatedMessages = await getMessages();
-        setMessages(updatedMessages.slice(0, 3));
+        // 새 메시지 저장 후 최근 메시지 다시 가져오기
+        const updatedMessages = await getMessages(3);
+        setMessages(updatedMessages);
       } else {
         alert('메시지 저장에 실패했습니다. 다시 시도해주세요.');
       }
@@ -156,31 +167,9 @@ export default function Messages() {
 
       <div className='mt-8'>
         <h2 className='text-2xl font-bold mb-4'>최근 메시지</h2>
-        <div className='space-y-4'>
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className='bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300'
-            >
-              <div className='flex items-start justify-between'>
-                <div>
-                  <p className='text-gray-800 mb-2'>{message.content}</p>
-                  <div className='flex items-center justify-between'>
-                    <p className='text-sm text-indigo-600 flex items-center'>
-                      <User className='mr-1' size={16} /> {message.name}
-                    </p>
-                    {message.createdAt && (
-                      <p className='text-sm text-gray-500'>
-                        {new Date(message.createdAt).toLocaleDateString()}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <MessageList messages={messages} loading={initialLoading} />
       </div>
+
       <div className='mt-4 text-center'>
         <Link
           href='/messages/list'

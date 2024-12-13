@@ -2,26 +2,25 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { MessageCircle, User } from 'lucide-react';
-import { Message, getMessages } from '@/utils/firebasedb';
+import { MessageCircle } from 'lucide-react';
+import { getMessages, Message } from '@/utils/firebasedb';
+import { MessageList } from '@/components/messages/MessageList';
 
-export default function MessageList() {
+export default function Page() {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
-    const fetchMessages = async () => {
+    (async () => {
       try {
-        const fetchedMessages = await getMessages();
-        setMessages(fetchedMessages);
+        const recentMessages = await getMessages(3); // 최근 3개의 메시지만 가져오기
+        setMessages(recentMessages);
       } catch (error) {
-        console.error('Error fetching messages:', error);
+        console.error('Error fetching recent messages:', error);
       } finally {
-        setLoading(false);
+        setInitialLoading(false);
       }
-    };
-
-    fetchMessages();
+    })();
   }, []);
 
   return (
@@ -29,34 +28,7 @@ export default function MessageList() {
       <h1 className='text-4xl font-bold text-center text-indigo-600 mb-8'>
         축복 메시지 목록
       </h1>
-      {loading ? (
-        <div className='text-center'>
-          <p className='text-gray-600'>메시지를 불러오는 중...</p>
-        </div>
-      ) : (
-        <div className='space-y-4'>
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className='bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300'
-            >
-              <div className='flex items-start justify-between'>
-                <div>
-                  <p className='text-gray-800 mb-2'>{message.content}</p>
-                  <div className='flex items-center justify-between'>
-                    <p className='text-sm text-indigo-600 flex items-center'>
-                      <User className='mr-1' size={16} /> {message.name}
-                    </p>
-                    <p className='text-sm text-gray-500'>
-                      {new Date(message.createdAt || '').toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <MessageList messages={messages} loading={initialLoading} />
       <div className='mt-8 text-center'>
         <Link
           href='/messages'

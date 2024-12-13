@@ -1,48 +1,69 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import Link from 'next/link';
 import { User } from 'lucide-react';
-import { saveMessage, Message, getMessages } from '@/utils/firebasedb';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { getMessages, Message, saveMessage } from '@/utils/firebasedb';
 import { hashPassword } from '@/utils/crypto';
-import { validateMessage } from '@/utils/validation';
+
+// Zod 스키마 정의
+const messageSchema = z.object({
+  name: z
+    .string()
+    .min(1, '이름을 입력해주세요.')
+    .max(20, '이름은 20자를 초과할 수 없습니다.')
+    .transform((val) => val.trim()),
+  content: z
+    .string()
+    .min(1, '메시지를 입력해주세요.')
+    .max(500, '메시지는 500자를 초과할 수 없습니다.')
+    .transform((val) => val.trim()),
+  password: z
+    .string()
+    .min(4, '비밀번호는 최소 4자 이상이어야 합니다.')
+    .max(20, '비밀번호는 20자를 초과할 수 없습니다.'),
+});
+
+type MessageFormData = z.infer<typeof messageSchema>;
 
 export default function Messages() {
-  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
-
-  const [formData, setFormData] = useState({
-    name: '',
-    content: '',
-    password: '',
-  });
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.content.trim()) {
-      alert('메시지를 입력해주세요.');
-      return;
-    }
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<MessageFormData>({
+    resolver: zodResolver(messageSchema),
+    defaultValues: {
+      name: '',
+      content: '',
+      password: '',
+    },
+  });
 
+  const onSubmit = async (data: MessageFormData) => {
     setLoading(true);
     try {
+      // 비밀번호 해시화
+      const hashedPassword = await hashPassword(data.password);
+
       const result = await saveMessage({
-        content: formData.content.trim(),
-        name: formData.name.trim() || '익명',
-        password: formData.password,
+        content: data.content,
+        name: data.name || '익명',
+        password: hashedPassword,
       });
 
       if (result.success) {
-        // 메시지 저장 성공 시 폼 초기화
-        setFormData({
-          name: '',
-          content: '',
-          password: '',
-        });
+        // 폼 초기화
+        reset();
 
-        // 새로운 메시지를 포함하여 최근 메시지 목록 업데이트
+        // 메시지 목록 업데이트
         const updatedMessages = await getMessages();
         setMessages(updatedMessages.slice(0, 3));
       } else {
@@ -56,18 +77,11 @@ export default function Messages() {
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
   return (
     <div className='container mx-auto p-4'>
       <h1 className='text-3xl font-bold mb-4'>메시지 게시판</h1>
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         className='bg-white p-4 sm:p-8 rounded-lg shadow-lg mb-8'
       >
         <div className='mb-4'>
@@ -80,11 +94,14 @@ export default function Messages() {
           <input
             type='text'
             id='name'
-            name='name'
-            className='w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:border-indigo-500'
-            value={formData.name}
-            onChange={handleChange}
+            className={`w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:border-indigo-500 ${
+              errors.name ? 'border-red-500' : ''
+            }`}
+            {...register('name')}
           />
+          {errors.name && (
+            <p className='mt-1 text-sm text-red-500'>{errors.name.message}</p>
+          )}
         </div>
         <div className='mb-4'>
           <label
@@ -96,12 +113,16 @@ export default function Messages() {
           <input
             type='password'
             id='password'
-            name='password'
-            className='w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:border-indigo-500'
-            value={formData.password}
-            onChange={handleChange}
-            required
+            className={`w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:border-indigo-500 ${
+              errors.password ? 'border-red-500' : ''
+            }`}
+            {...register('password')}
           />
+          {errors.password && (
+            <p className='mt-1 text-sm text-red-500'>
+              {errors.password.message}
+            </p>
+          )}
         </div>
         <div className='mb-4'>
           <label
@@ -112,13 +133,17 @@ export default function Messages() {
           </label>
           <textarea
             id='content'
-            name='content'
-            className='w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:border-indigo-500'
-            value={formData.content}
-            onChange={handleChange}
-            required
+            className={`w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:border-indigo-500 ${
+              errors.content ? 'border-red-500' : ''
+            }`}
             rows={4}
+            {...register('content')}
           />
+          {errors.content && (
+            <p className='mt-1 text-sm text-red-500'>
+              {errors.content.message}
+            </p>
+          )}
         </div>
         <button
           type='submit'
@@ -128,6 +153,7 @@ export default function Messages() {
           {loading ? '저장 중...' : '등록'}
         </button>
       </form>
+
       <div className='mt-8'>
         <h2 className='text-2xl font-bold mb-4'>최근 메시지</h2>
         <div className='space-y-4'>

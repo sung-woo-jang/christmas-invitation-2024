@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     siteName: '크리스마스 초대장',
     images: [
       {
-        url: '/Christmas.webp',
+        url: '/KakaoTalk_Photo_2024-12-14-02-50-24.jpeg',
         width: 1200,
         height: 630,
         alt: '크리스마스 초대장 미리보기',

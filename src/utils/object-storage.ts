@@ -14,7 +14,7 @@ interface ParsedResponse {
   };
 }
 
-interface Photo {
+export interface Photo {
   id: number;
   name: string;
   lastModified: string;

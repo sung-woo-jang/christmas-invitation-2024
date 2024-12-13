@@ -1,12 +1,12 @@
 import { Suspense } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import UploadForm from '@/app/photozone/list/upload';
+import UploadForm from '@/app/photozone/list/UploadForm';
 import { revalidatePath } from 'next/cache';
 import { getPhotosWithBase64 } from '@/utils/object-storage';
+import PhotoZoneList from '@/components/photozone/PhotoZoneList';
 
-export default async function PhotoZoneList() {
+export default async function Page() {
   const photos = await getPhotosWithBase64();
 
   async function revalidatePhotos() {
@@ -27,20 +27,7 @@ export default async function PhotoZoneList() {
         </Suspense>
       </div>
 
-      <div className='grid gap-6'>
-        {photos?.map((photo) => (
-          <div key={photo.id} className='bg-white p-6 rounded-lg shadow-lg'>
-            <div className='aspect-video relative mb-4'>
-              <Image
-                src={photo?.base64Url ? photo?.base64Url : '/Christmas.webp'}
-                alt={`포토존 ${photo.id}`}
-                fill
-                className='rounded-lg object-cover'
-              />
-            </div>
-          </div>
-        ))}
-      </div>
+      <PhotoZoneList photos={photos} />
 
       <div className='flex justify-center mt-8'>
         <Button asChild>

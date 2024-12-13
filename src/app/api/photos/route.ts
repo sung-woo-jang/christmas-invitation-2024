@@ -1,6 +1,7 @@
 import axios from 'axios';
 import crypto from 'crypto';
 import { NextResponse } from 'next/server';
+import sharp from 'sharp';
 import { getPhotosWithBase64, getSignatureKey } from '@/utils/object-storage';
 
 export async function GET() {
@@ -32,12 +33,20 @@ export async function PUT(request: Request) {
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const fileName = encodeURIComponent(file.name);
-
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
+    const buffer = await sharp(Buffer.from(await file.arrayBuffer()))
+      .resize({
+        width: 430,
+        height: 932,
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .jpeg({ quality: 80 })
+      .toBuffer();
+
     const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
     const timestamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
     const region = 'kr-standard';

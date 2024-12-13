@@ -1,72 +1,66 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { User } from 'lucide-react';
-
-interface Message {
-  id: number;
-  content: string;
-  name: string;
-  password: string;
-}
+import { saveMessage, Message, getMessages } from '@/utils/firebasedb';
+import { hashPassword } from '@/utils/crypto';
+import { validateMessage } from '@/utils/validation';
 
 export default function Messages() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      content: '축하드립니다! 행복한 날 되세요.',
-      name: '김철수',
-      password: 'qwe',
-    },
-    {
-      id: 2,
-      content: '새로운 출발을 응원합니다!',
-      name: '이영희',
-      password: 'qwe',
-    },
-    {
-      id: 3,
-      content: '축하합니다. 좋은 날 되세요~',
-      name: '박지성',
-      password: 'qwe',
-    },
-    {
-      id: 4,
-      content: '늘 행복하세요~~~~~~~~~~!',
-      name: '최유리',
-      password: 'qwe',
-    },
-    {
-      id: 5,
-      content: '축하드려요! 멋진 날 되세요.',
-      name: '정민수',
-      password: 'qwe',
-    },
-  ]);
-  const [newMessage, setNewMessage] = useState('');
-  const [name, setName] = useState('');
-  const [password, setPassword] = useState('');
+  const router = useRouter();
+  const [messages, setMessages] = useState<Message[]>([]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    content: '',
+    password: '',
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newMessage.trim() && password === '1234') {
-      // 임시 비밀번호 '1234' 설정
-      setMessages([
-        {
-          id: Date.now(),
-          content: newMessage.trim(),
-          name: name.trim() || '익명',
-          password: password.trim() || '1234',
-        },
-        ...messages,
-      ]);
-      setNewMessage('');
-      setName('');
-      setPassword('');
-    } else if (password !== '1234') {
-      alert('비밀번호가 올바르지 않습니다.');
+    if (!formData.content.trim()) {
+      alert('메시지를 입력해주세요.');
+      return;
     }
+
+    setLoading(true);
+    try {
+      const result = await saveMessage({
+        content: formData.content.trim(),
+        name: formData.name.trim() || '익명',
+        password: formData.password,
+      });
+
+      if (result.success) {
+        // 메시지 저장 성공 시 폼 초기화
+        setFormData({
+          name: '',
+          content: '',
+          password: '',
+        });
+
+        // 새로운 메시지를 포함하여 최근 메시지 목록 업데이트
+        const updatedMessages = await getMessages();
+        setMessages(updatedMessages.slice(0, 3));
+      } else {
+        alert('메시지 저장에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -86,9 +80,10 @@ export default function Messages() {
           <input
             type='text'
             id='name'
+            name='name'
             className='w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:border-indigo-500'
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={formData.name}
+            onChange={handleChange}
           />
         </div>
         <div className='mb-4'>
@@ -101,38 +96,42 @@ export default function Messages() {
           <input
             type='password'
             id='password'
+            name='password'
             className='w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:border-indigo-500'
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={formData.password}
+            onChange={handleChange}
             required
           />
         </div>
         <div className='mb-4'>
           <label
-            htmlFor='message'
+            htmlFor='content'
             className='block text-sm font-medium text-gray-700 mb-2'
           >
             메시지
           </label>
           <textarea
-            id='message'
+            id='content'
+            name='content'
             className='w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:border-indigo-500'
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
+            value={formData.content}
+            onChange={handleChange}
             required
+            rows={4}
           />
         </div>
         <button
           type='submit'
-          className='w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+          disabled={loading}
+          className='w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50'
         >
-          등록
+          {loading ? '저장 중...' : '등록'}
         </button>
       </form>
       <div className='mt-8'>
         <h2 className='text-2xl font-bold mb-4'>최근 메시지</h2>
         <div className='space-y-4'>
-          {messages.slice(0, 3).map((message) => (
+          {messages.map((message) => (
             <div
               key={message.id}
               className='bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300'
@@ -140,9 +139,16 @@ export default function Messages() {
               <div className='flex items-start justify-between'>
                 <div>
                   <p className='text-gray-800 mb-2'>{message.content}</p>
-                  <p className='text-sm text-indigo-600 flex items-center'>
-                    <User className='mr-1' size={16} /> {message.name}
-                  </p>
+                  <div className='flex items-center justify-between'>
+                    <p className='text-sm text-indigo-600 flex items-center'>
+                      <User className='mr-1' size={16} /> {message.name}
+                    </p>
+                    {message.createdAt && (
+                      <p className='text-sm text-gray-500'>
+                        {new Date(message.createdAt).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

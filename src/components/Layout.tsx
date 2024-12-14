@@ -34,18 +34,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               >
                 포토존
               </Link>
-              <Link
-                href='/messages'
-                className='text-gray-700 hover:text-indigo-600 transition duration-300'
-              >
-                메시지 작성
-              </Link>
-              <Link
-                href='/messages/list'
-                className='text-gray-700 hover:text-indigo-600 transition duration-300'
-              >
-                메시지 목록
-              </Link>
             </div>
             <div className='md:hidden flex items-center'>
               <button
@@ -75,18 +63,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 className='block text-gray-700 hover:text-indigo-600 transition duration-300 bg-gray-100 rounded-lg px-4 py-2 hover:bg-indigo-50'
               >
                 포토존
-              </Link>
-              <Link
-                href='/messages'
-                className='block text-gray-700 hover:text-indigo-600 transition duration-300 bg-gray-100 rounded-lg px-4 py-2 hover:bg-indigo-50'
-              >
-                메시지 작성
-              </Link>
-              <Link
-                href='/messages/list'
-                className='block text-gray-700 hover:text-indigo-600 transition duration-300 bg-gray-100 rounded-lg px-4 py-2 hover:bg-indigo-50'
-              >
-                메시지 목록
               </Link>
             </div>
           </div>

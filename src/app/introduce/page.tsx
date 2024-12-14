@@ -129,7 +129,6 @@ export default async function Page() {
       </Card>
 
       {/*
-(사진업로드 버튼)
 (사진 게시판 갤러리로 쭉 보여주기)
       */}
     </div>

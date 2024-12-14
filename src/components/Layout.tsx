@@ -17,7 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='flex justify-between h-16'>
             <div className='flex items-center'>
-              <Link href='/' className='text-2xl font-bold text-indigo-600'>
+              <Link href='/' className='text-2xl font-bold text-red-600'>
                 내 트리를 꾸며줘
               </Link>
             </div>

@@ -76,7 +76,10 @@ export default function UploadForm({
   return (
     <Card className='w-full max-w-md mx-auto'>
       <CardHeader>
-        <CardTitle className='text-2xl font-bold text-center text-indigo-600'>
+        <CardTitle
+          className='text-2xl font-bold text-center'
+          style={{ color: '#cd1d1d' }}
+        >
           사진 업로드
         </CardTitle>
       </CardHeader>
@@ -91,7 +94,7 @@ export default function UploadForm({
                 accept='image/*'
                 onChange={handleFileChange}
                 ref={fileInputRef}
-                className='cursor-pointer file:mr-2 file:px-2 file:rounded-md file:border file:border-indigo-300 file:text-sm file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100'
+                className='cursor-pointer file:mr-2 file:px-2 file:rounded-md file:border file:border-red-300 file:text-sm file:bg-red-50 file:text-red-700 hover:file:bg-indigo-100'
               />
               {selectedFile && (
                 <span className='text-sm text-gray-500'>

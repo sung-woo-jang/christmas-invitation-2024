@@ -20,7 +20,9 @@ export default async function Page() {
         </CardHeader>
         <CardContent>
           <p className='text-center mb-4'>
-            예배실 문 앞 트리에 자신이 준비한 오너먼트를 달아주세요!
+            예배실 문 앞 트리에 자신이 준비한
+            <br />
+            오너먼트를 달아주세요!
             <br />
             다*소, 직접 만든 수제 오너먼트 다 환영🤗
           </p>
@@ -46,7 +48,9 @@ export default async function Page() {
           <p className='text-center mb-4'>
             게시판에 있는 트리에 감사기도를 적어주세요!
             <br />
-            여러분의 감사가 많이 적혀질 수록 트리가 풍성해져요🎄
+            여러분의 감사가 많이 적혀질 수록
+            <br />
+            트리가 풍성해져요🎄
           </p>
           <div className='relative w-full h-64'>
             <Image
@@ -68,7 +72,9 @@ export default async function Page() {
         </CardHeader>
         <CardContent>
           <p className='text-center mb-4'>
-            가정별로 사진을 찍어주세요. 이혜주 팀장에게 보내면 끗!
+            가정별로 사진을 찍어주세요.
+            <br />
+            이혜주 팀장에게 보내면 끗!
             <br />
             사진은 1:1 정방향으로 찍기!
           </p>
@@ -95,7 +101,9 @@ export default async function Page() {
             <br />내 트리를 꾸며줘~~🎄
           </p>
           <p className='text-center mb-4 font-bold'>
-            👇🏻여기서도 내가 찍은 사진을 자랑할 수 있어요👇🏻
+            👇🏻여기서도 내가 찍은 사진을
+            <br />
+            자랑할 수 있어요👇🏻
           </p>
           <div className='flex justify-center'>
             <div className='mb-8'>

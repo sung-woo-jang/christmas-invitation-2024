@@ -17,6 +17,42 @@ export default async function Page() {
       <Card className='w-full max-w-md'>
         <CardHeader>
           <CardTitle className='text-xl font-bold text-center text-green-700'>
+            🎄 하늘제자 크리스마스 트리 꾸미기 🎄
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className='text-center mb-4 mt-4'>
+            예수님이 태어나심을 축하하는 성탄절!
+            <br />
+            예준팀도 그 기쁨을 맞이하여
+            <br />
+            트리를 꾸미는데,,,
+          </p>
+          <p className='text-center font-bold mb-4'>어랏!? 트리가 휑하다!?😱</p>
+          <div className='relative w-full h-64 mb-4'>
+            <Image
+              src='/1.jpeg'
+              alt='휑한 트리'
+              layout='fill'
+              objectFit='cover'
+              className='rounded-lg'
+            />
+          </div>
+          <p className='text-center font-bold mb-4'>
+            🚨하늘제자 여러분의 도움이 필요합니다🚨
+          </p>
+          <p className='text-center mb-4'>
+            여러분이 직접 트리의 오너먼트를 달아서
+            <br />
+            크리스마스를 함께 준비해 주세요!
+            <br />내 트리를 꾸며줘~~~🎄
+          </p>
+          <p className='text-center font-bold'>어떻게 하냐구요?🏃</p>
+        </CardContent>
+      </Card>
+      <Card className='w-full max-w-md'>
+        <CardHeader>
+          <CardTitle className='text-xl font-bold text-center text-green-700'>
             1️⃣ 오너먼트 달기
           </CardTitle>
         </CardHeader>
@@ -30,7 +66,7 @@ export default async function Page() {
           </p>
           <div className='relative w-full h-64'>
             <Image
-              src='/1.jpeg'
+              src='/4.jpeg'
               alt='오너먼트 달기'
               layout='fill'
               objectFit='cover'

@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import { Photo } from '@/utils/object-storage';
 import { useState } from 'react';
-import { Loader2, X } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -79,12 +79,12 @@ export default function PhotoZoneList({
                   className='object-cover'
                   sizes='(max-width: 430px) 90vw, (max-width: 768px) 45vw, 30vw'
                 />
-                <button
-                  onClick={() => handleDeleteClick(photo)}
-                  className='absolute top-2 right-2 bg-black bg-opacity-50 text-white p-1 rounded-full hover:bg-opacity-75 transition-opacity'
-                >
-                  <X size={20} />
-                </button>
+                {/*<button*/}
+                {/*  onClick={() => handleDeleteClick(photo)}*/}
+                {/*  className='absolute top-2 right-2 bg-black bg-opacity-50 text-white p-1 rounded-full hover:bg-opacity-75 transition-opacity'*/}
+                {/*>*/}
+                {/*  <X size={20} />*/}
+                {/*</button>*/}
               </div>
             </CardContent>
           </Card>

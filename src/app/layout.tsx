@@ -19,8 +19,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: 'https://christmas-invitation-2024.vercel.app/123.jpeg',
-        width: 1200,
-        height: 630,
+        width: 3024,
+        height: 4032,
         alt: '내 트리를 꾸며줘🎄 미리보기',
       },
     ],

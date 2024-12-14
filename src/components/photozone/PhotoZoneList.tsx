@@ -50,9 +50,9 @@ export default function PhotoZoneList({
         },
       );
 
-      // if (!response.ok) {
-      //   throw new Error('Failed to delete photo');
-      // }
+      if (!response.ok) {
+        return;
+      }
 
       setIsDeleteModalOpen(false);
       setPhotoToDelete(null);

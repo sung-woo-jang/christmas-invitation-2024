@@ -17,7 +17,7 @@ export default async function Page() {
 
       <div className='flex justify-center mt-8'>
         <Button asChild>
-          <Link href='/photozone'>포토존 메인으로 돌아가기</Link>
+          <Link href='/introduce'>메인으로 돌아가기</Link>
         </Button>
       </div>
     </div>

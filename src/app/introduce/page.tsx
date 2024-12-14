@@ -3,6 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Suspense } from 'react';
 import UploadForm from '@/app/photozone/UploadForm';
 import { revalidatePath } from 'next/cache';
+import { Button } from '@/components/ui/button';
+import { Loader2, Upload } from 'lucide-react';
+import Link from 'next/link';
 
 export default async function Page() {
   async function revalidatePhotos() {
@@ -67,16 +70,20 @@ export default async function Page() {
       <Card className='w-full max-w-md'>
         <CardHeader>
           <CardTitle className='text-xl font-bold text-center text-green-700'>
-            3️⃣ 가정별 사진 찍기
+            3️⃣ 가정 자랑 찰칵
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className='text-center mb-4'>
-            가정별로 사진을 찍어주세요.
+            가정별로 사진을 찍어서📸
             <br />
             이혜주 팀장에게 보내면 끗!
             <br />
-            사진은 1:1 정방향으로 찍기!
+            보내준 사진은 트리 옆에
+            <br />
+            멋지게 장식할게요☺️
+            <br />
+            *주의 : 1:1비율로 찍어주세요!
           </p>
           <div className='relative w-full h-64'>
             <Image
@@ -91,9 +98,9 @@ export default async function Page() {
       </Card>
       <Card className='w-full max-w-md'>
         <CardHeader>
-          <CardTitle className='text-xl font-bold text-center text-green-700'>
-            🎄 내 트리 꾸미기
-          </CardTitle>
+          {/*<CardTitle className='text-xl font-bold text-center text-green-700'>*/}
+          {/*  🎄 내 트리 꾸미기*/}
+          {/*</CardTitle>*/}
         </CardHeader>
         <CardContent>
           <p className='text-center mb-4'>
@@ -104,12 +111,19 @@ export default async function Page() {
             👇🏻여기서도 내가 찍은 사진을
             <br />
             자랑할 수 있어요👇🏻
+            <br />
+          </p>
+          <p className='text-center text-sm text-gray-500 mt-2'>
+            (제발 자랑해 주세요 예준 팀이 여섯 시간 준비함🥲)
           </p>
           <div className='flex justify-center'>
             <div className='mb-8'>
               <Suspense fallback={<div>업로드 폼 로딩중...</div>}>
                 <UploadForm onUploadCompleteAction={revalidatePhotos} />
               </Suspense>
+              <Button type='submit' className='mt-8 w-full'>
+                <Link href='/photozone'>하늘제자 포토존 구경가기 👀</Link>
+              </Button>
             </div>
           </div>
         </CardContent>

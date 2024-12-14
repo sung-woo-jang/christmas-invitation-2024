@@ -18,7 +18,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className='flex justify-between h-16'>
             <div className='flex items-center'>
               <Link href='/' className='text-2xl font-bold text-red-600'>
-                내 트리를 꾸며줘
+                내 트리를 꾸며줘🎄
               </Link>
             </div>
             <div className='hidden md:flex items-center space-x-4'>

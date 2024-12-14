@@ -81,7 +81,7 @@ export const getMessages = async (limit?: number): Promise<Message[]> => {
     }
     return [];
   } catch (error) {
-    console.error('Error fetching messages:', error);
+    console.error('Error fetching introduce:', error);
     return [];
   }
 };

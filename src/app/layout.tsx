@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     siteName: '내 트리를 꾸며줘🎄',
     images: [
       {
-        url: '/123.jpeg',
+        url: 'https://christmas-invitations.vercel.app/123.jpeg',
         width: 3024,
         height: 4032,
         alt: '내 트리를 꾸며줘🎄 미리보기',

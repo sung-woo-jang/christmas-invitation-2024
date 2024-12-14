@@ -7,7 +7,7 @@ import { Toaster } from '@/components/ui/toaster';
 export const metadata: Metadata = {
   title: '내 트리를 꾸며줘🎄',
   description: '예수님의 생일파티에 초대합니다.',
-  metadataBase: new URL('https://christmas-invitation-2024.vercel.app/'), // 실제 도메인으로 변경
+  metadataBase: new URL('https://christmas-invitations.vercel.app/'), // 실제 도메인으로 변경
   openGraph: {
     title: '내 트리를 꾸며줘🎄',
     description:
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     siteName: '내 트리를 꾸며줘🎄',
     images: [
       {
-        url: 'https://christmas-invitation-2024.vercel.app/123.jpeg',
+        url: '/123.jpeg',
         width: 3024,
         height: 4032,
         alt: '내 트리를 꾸며줘🎄 미리보기',

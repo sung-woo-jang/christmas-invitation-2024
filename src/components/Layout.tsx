@@ -1,14 +1,9 @@
-'use client';
-import React, { useState } from 'react';
 import Link from 'next/link';
 import { Montserrat } from 'next/font/google';
-import { Menu, X } from 'lucide-react';
 
 const montserrat = Montserrat({ subsets: ['latin'] });
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   return (
     <div
       className={`min-h-screen bg-gray-50 text-gray-900 ${montserrat.className}`}

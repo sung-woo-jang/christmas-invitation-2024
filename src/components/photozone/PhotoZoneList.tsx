@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import { Photo } from '@/utils/object-storage';
 import { useState } from 'react';
-import { Trash2, Loader2, X } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -41,7 +41,7 @@ export default function PhotoZoneList({
       setIsDeleting(true);
       setError(null);
       const fileName = photoToDelete.name.split('/').pop();
-      if (!fileName) throw new Error('Invalid file name');
+      if (!fileName) return;
 
       const response = await fetch(
         `/api/photos?fileName=${encodeURIComponent(fileName)}`,

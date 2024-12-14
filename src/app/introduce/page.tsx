@@ -4,7 +4,6 @@ import { Suspense } from 'react';
 import UploadForm from '@/app/photozone/UploadForm';
 import { revalidatePath } from 'next/cache';
 import { Button } from '@/components/ui/button';
-import { Loader2, Upload } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function Page() {

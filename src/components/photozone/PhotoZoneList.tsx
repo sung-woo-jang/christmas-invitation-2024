@@ -73,7 +73,7 @@ export default function PhotoZoneList({
             <CardContent className='p-0'>
               <div className='aspect-[3/4] relative'>
                 <Image
-                  src={photo?.base64Url ? photo?.base64Url : '/Christmas.webp'}
+                  src={photo?.base64Url ? photo?.base64Url : '/123.jpeg'}
                   alt={`포토존 ${photo.id}`}
                   fill
                   className='object-cover'

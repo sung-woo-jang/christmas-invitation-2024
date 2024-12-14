@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     siteName: '내 트리를 꾸며줘',
     images: [
       {
-        url: '/KakaoTalk_Photo_2024-12-14-02-50-24.jpeg',
+        url: '/123.jpeg',
         width: 1200,
         height: 630,
         alt: '내 트리를 꾸며줘 미리보기',

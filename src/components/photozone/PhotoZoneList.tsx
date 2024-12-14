@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import { Photo } from '@/utils/object-storage';
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { Trash2, Loader2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,6 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Card, CardContent } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface PhotoZonePreviewProps {
   photos: Photo[];
@@ -24,6 +26,8 @@ export default function PhotoZoneList({
 }: PhotoZonePreviewProps) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [photoToDelete, setPhotoToDelete] = useState<Photo | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleDeleteClick = (photo: Photo) => {
     setPhotoToDelete(photo);
@@ -34,9 +38,10 @@ export default function PhotoZoneList({
     if (!photoToDelete) return;
 
     try {
-      // URL에서 파일명만 추출 (마지막 '/' 이후의 문자열)
+      setIsDeleting(true);
+      setError(null);
       const fileName = photoToDelete.name.split('/').pop();
-      if (!fileName) return;
+      if (!fileName) throw new Error('Invalid file name');
 
       const response = await fetch(
         `/api/photos?fileName=${encodeURIComponent(fileName)}`,
@@ -45,44 +50,44 @@ export default function PhotoZoneList({
         },
       );
 
-      if (!response.ok) {
-        throw new Error('Failed to delete photo');
-      }
+      // if (!response.ok) {
+      //   throw new Error('Failed to delete photo');
+      // }
 
-      // 성공적으로 삭제되면 UI에서도 제거
       setIsDeleteModalOpen(false);
       setPhotoToDelete(null);
       window.location.reload();
     } catch (error) {
       console.error('Error deleting photo:', error);
-      // 에러 처리 로직 추가
+      setError('사진 삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
   return (
     <>
-      <div className='grid gap-4 sm:gap-6'>
+      <div className='grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3'>
         {photos?.slice(0, limit).map((photo) => (
-          <div
-            key={photo.id}
-            className='bg-white p-2 sm:p-4 rounded-lg shadow-lg relative'
-          >
-            <div className='aspect-[3/4] relative'>
-              <Image
-                src={photo?.base64Url ? photo?.base64Url : '/Christmas.webp'}
-                alt={`포토존 ${photo.id}`}
-                fill
-                className='rounded-lg object-cover'
-                sizes='(max-width: 430px) 90vw, (max-width: 768px) 45vw, 30vw'
-              />
-              <button
-                onClick={() => handleDeleteClick(photo)}
-                className='absolute top-2 right-2 bg-black bg-opacity-50 text-white p-1 rounded-full hover:bg-opacity-75 transition-opacity'
-              >
-                <X size={20} />
-              </button>
-            </div>
-          </div>
+          <Card key={photo.id} className='overflow-hidden'>
+            <CardContent className='p-0'>
+              <div className='aspect-[3/4] relative'>
+                <Image
+                  src={photo?.base64Url ? photo?.base64Url : '/Christmas.webp'}
+                  alt={`포토존 ${photo.id}`}
+                  fill
+                  className='object-cover'
+                  sizes='(max-width: 430px) 90vw, (max-width: 768px) 45vw, 30vw'
+                />
+                <button
+                  onClick={() => handleDeleteClick(photo)}
+                  className='absolute top-2 right-2 bg-black bg-opacity-50 text-white p-1 rounded-full hover:bg-opacity-75 transition-opacity'
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
@@ -94,15 +99,32 @@ export default function PhotoZoneList({
               정말로 이 사진을 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.
             </DialogDescription>
           </DialogHeader>
+          {error && (
+            <Alert variant='destructive'>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
           <DialogFooter>
             <Button
               variant='outline'
               onClick={() => setIsDeleteModalOpen(false)}
+              disabled={isDeleting}
             >
               취소
             </Button>
-            <Button variant='destructive' onClick={handleDeleteConfirm}>
-              삭제
+            <Button
+              variant='destructive'
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                  삭제 중...
+                </>
+              ) : (
+                '삭제'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

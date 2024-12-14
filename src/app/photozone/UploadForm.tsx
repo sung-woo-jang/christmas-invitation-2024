@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Card,
   CardContent,
@@ -11,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { AlertCircle, Upload, Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2, Upload } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function UploadForm({
@@ -57,7 +56,7 @@ export default function UploadForm({
         body: formData,
       });
 
-      if (!response.ok) throw new Error('Upload failed');
+      // if (!response.ok) throw new Error('Upload failed');
 
       await response.json();
       onUploadCompleteAction();

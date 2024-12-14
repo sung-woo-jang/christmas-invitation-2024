@@ -12,6 +12,7 @@ export default function Home() {
         width={430}
         height={932}
         objectFit={'cover'}
+        className={'mb-8'}
       />
       <Button asChild variant='outline' size='lg' className='gap-2'>
         <Link href='/introduce'>

@@ -15,18 +15,24 @@ export default async function Page() {
   return (
     <div className='flex flex-col items-center justify-center min-h-[calc(100vh-200px)] p-4 space-y-8'>
       <Card className='w-full max-w-md'>
-        <CardHeader>
-          <CardTitle className='text-xl font-bold text-center text-green-700'>
-            🎄 하늘제자 크리스마스 트리 꾸미기 🎄
-          </CardTitle>
-        </CardHeader>
+        {/*<CardHeader>*/}
+        {/*  <CardTitle className='text-xl font-bold text-center text-green-700'>*/}
+        {/*    🎄 하늘제자 크리스마스 트리 꾸미기 🎄*/}
+        {/*  </CardTitle>*/}
+        {/*</CardHeader>*/}
         <CardContent>
-          <p className='text-center mb-4 mt-4'>
+          <p className='text-center mb-4 mt-6'>
             예수님이 태어나심을 축하하는 성탄절!
             <br />
             예준팀도 그 기쁨을 맞이하여
             <br />
-            트리를 꾸미는데,,,
+            트리를 꾸미는데,,,🎄
+            <br />
+            <br />.
+            <br />.
+            <br />.
+            <br />
+            <br />
           </p>
           <p className='text-center font-bold mb-4'>어랏!? 트리가 휑하다!?😱</p>
           <div className='relative w-full h-64 mb-4'>

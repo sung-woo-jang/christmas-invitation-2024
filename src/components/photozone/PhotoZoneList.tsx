@@ -12,7 +12,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { revalidatePath } from 'next/cache';
 
 interface PhotoZonePreviewProps {
   photos: Photo[];

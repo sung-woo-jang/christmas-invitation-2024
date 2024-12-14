@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { AlertCircle, Upload } from 'lucide-react';
+import { AlertCircle, Upload, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function UploadForm({
@@ -22,10 +22,12 @@ export default function UploadForm({
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    setSelectedFile(file || null);
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -40,10 +42,7 @@ export default function UploadForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const file = formData.get('file') as File;
-
-    if (!file) {
+    if (!selectedFile) {
       setError('파일을 선택해주세요.');
       return;
     }
@@ -51,6 +50,8 @@ export default function UploadForm({
     try {
       setIsUploading(true);
       setError(null);
+      const formData = new FormData();
+      formData.append('file', selectedFile);
       const response = await fetch('/api/photos', {
         method: 'PUT',
         body: formData,
@@ -61,6 +62,7 @@ export default function UploadForm({
       await response.json();
       onUploadCompleteAction();
       setPreviewUrl(null);
+      setSelectedFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -82,19 +84,22 @@ export default function UploadForm({
       <CardContent>
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div className='space-y-2'>
-            <Label htmlFor='file' className='text-sm font-medium text-gray-700'>
-              사진 선택
-            </Label>
-            <Input
-              required
-              type='file'
-              name='file'
-              id='file'
-              accept='image/*'
-              onChange={handleFileChange}
-              ref={fileInputRef}
-              className='cursor-pointer'
-            />
+            <div className='flex items-center space-x-2'>
+              <Input
+                type='file'
+                name='file'
+                id='file'
+                accept='image/*'
+                onChange={handleFileChange}
+                ref={fileInputRef}
+                className='cursor-pointer file:mr-2 file:px-2 file:rounded-md file:border file:border-indigo-300 file:text-sm file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100'
+              />
+              {selectedFile && (
+                <span className='text-sm text-gray-500'>
+                  {selectedFile.name}
+                </span>
+              )}
+            </div>
           </div>
           {previewUrl && (
             <div className='mt-4'>
@@ -113,10 +118,14 @@ export default function UploadForm({
             </Alert>
           )}
           <CardFooter className='px-0'>
-            <Button type='submit' disabled={isUploading} className='w-full'>
+            <Button
+              type='submit'
+              disabled={isUploading || !selectedFile}
+              className='w-full'
+            >
               {isUploading ? (
                 <>
-                  <Upload className='mr-2 h-4 w-4 animate-spin' />
+                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                   업로드 중...
                 </>
               ) : (

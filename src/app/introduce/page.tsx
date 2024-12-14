@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Suspense } from 'react';
-import UploadForm from '@/app/photozone/list/UploadForm';
+import UploadForm from '@/app/photozone/UploadForm';
 import { revalidatePath } from 'next/cache';
 
 export default async function Page() {
